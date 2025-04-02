@@ -7,5 +7,6 @@ The packages you'll need to install to use the included code are:
 
 - tidyverse
 - tidyquant
+- tidycensus
 - janitor
 - writexl
