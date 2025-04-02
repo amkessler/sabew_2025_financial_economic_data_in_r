@@ -184,8 +184,30 @@ annualreturns_data %>%
          subtitle = "2000 through the present",
          y = "Returns", x = "", color = "") +
     scale_y_continuous(labels = scales::percent) +
+    scale_x_reverse() +  # this reverses the order of years
     coord_flip() +
     theme_tq() 
+
+```
+
+We can spruce up the chart in any way we want - let's say for example we wanted to
+show colors tied to positive or negative returns.
+
+```{r}
+
+annualreturns_data %>%
+    ggplot(aes(x = year(date), y = annual_return, fill = annual_return > 0)) +
+    geom_col() +
+    scale_fill_manual(values = c("firebrick", "forestgreen")) +
+    labs(title = "Annual Returns", 
+         subtitle = "2000 through the present",
+         y = "Returns", x = "", fill = "") +
+    scale_y_continuous(labels = scales::percent) +
+    scale_x_reverse() +  # this reverses the order of years
+    coord_flip() +
+    theme_tq() +
+    theme(legend.position = "none")
+
 
 ```
 
@@ -366,44 +388,44 @@ FRED even compiles numerous measures below the national level, which you can app
 
 https://fred.stlouisfed.org/categories/3008
 
-For example, Per Capita Personal Income data (annual) is available at the county level in many states. Let's look at [Sarasota County, Florida](https://fred.stlouisfed.org/series/PCPI12115).
+For example, Per Capita Personal Income data (annual) is available at the county level in many states. Let's look at [Arlington County, Virginia](https://fred.stlouisfed.org/series/PCPI51013), where we're sitting right now.
 
 ```{r}
 
-sarasota_pcpi <- tq_get("PCPI12115", get = "economic.data", from = "2010-01-01")
+arlington_pcpi <- tq_get("PCPI51013", get = "economic.data", from = "2010-01-01")
 
-sarasota_pcpi 
+arlington_pcpi 
 
 
 
 ```
 
-Keep in mind that for many such localized measures, the FRED site makes it easy to see a nationwide map of all counties, or the relevant geographies. Let's take a look. (We'll talk about how to create such maps in R later on.)
+Keep in mind that for many such localized measures, the FRED site makes it easy to see a nationwide map of all counties, or the relevant geographies. Let's take a look. 
 
-Sticking with Sarasota County for a moment, let's examine some other measures.
+Sticking with Arlington for a moment, let's examine some other measures.
 
-How about the [5-year home ownership rate estimate](https://fred.stlouisfed.org/series/HOWNRATEACS012115).
+How about the [5-year home ownership rate estimate](https://fred.stlouisfed.org/series/HOWNRATEACS051013).
 
 ```{r}
 
-sarasota_5yhomeownership <- tq_get("HOWNRATEACS012115", get = "economic.data", from = "2010-01-01")
+arlington_5yhomeownership <- tq_get("HOWNRATEACS051013", get = "economic.data", from = "2010-01-01")
 
-sarasota_5yhomeownership 
+arlington_5yhomeownership 
 
 
 
 
 ```
 
-How about the county's [Subprime Credit Population, by quarter](https://fred.stlouisfed.org/series/EQFXSUBPRIME012115). This data only begins in 2014, but...pretty interesting!
+How about the county's [Subprime Credit Population, by quarter](https://fred.stlouisfed.org/series/EQFXSUBPRIME051013). This data only begins in 2014, but...pretty interesting!
 
 ```{r}
 
-sarasota_subprimepop <- tq_get("EQFXSUBPRIME012115", get = "economic.data", from = "2014-01-01")
+arlington_subprimepop <- tq_get("EQFXSUBPRIME051013", get = "economic.data", from = "2014-01-01")
 
-sarasota_subprimepop 
+arlington_subprimepop 
 
-sarasota_subprimepop %>% 
+arlington_subprimepop %>% 
   ggplot(aes(x = date, y = price)) +
   geom_line(color = "darkred") +
   theme_minimal()
@@ -411,7 +433,7 @@ sarasota_subprimepop %>%
 
 ```
 
-How about right where we are sitting in Washington, D.C. -- if you happen to be curious how many businesses were formed on a monthly basis, you could pull [business application data](https://fred.stlouisfed.org/series/BABATOTALSADC).
+How about right across the river in Washington, D.C. -- if you happen to be curious how many businesses were formed on a monthly basis, you could pull [business application data](https://fred.stlouisfed.org/series/BABATOTALSADC).
 
 ```{r}
 
@@ -427,7 +449,7 @@ dc_bizapplications %>%
 
 ```
 
-While we're at it, how are home prices looking around the DC metro area? Let's examine the [Case-Shiller index](https://fred.stlouisfed.org/series/WDXRSA)...
+While we're at it, how are home prices looking around the whole DC metro area? Let's examine the [Case-Shiller index](https://fred.stlouisfed.org/series/WDXRSA)...
 
 ```{r}
 
@@ -439,4 +461,4 @@ tq_get("WDXRSA", get = "economic.data", from = "2014-01-01") %>%
 
 ```
 
-As you can see, there are an almost infinite number of ways to use FRED data both to capture the local picture, as well as the national one, and search for information that can help fuel insightful reporting.
+As you can see, there are almost an infinite number of ways to use FRED data both to capture the local picture, as well as the national one, and search for information that can help fuel insightful reporting.
