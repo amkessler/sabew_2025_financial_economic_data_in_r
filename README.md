@@ -4,6 +4,10 @@ This repository contains the code used for the R presentation given at the 2025 
 
 To install the packages you'll need to run this demonstration, you can run this line in the console within RStudio:
 
-`install.packages(c("tidyverse", "lubridate", "janitor", "tidyquant", "writexl", "googlesheets4"))`
+`install.packages(c("tidyverse", "lubridate", "janitor", "tidyquant", "writexl", "googlesheets4", "usethis"))`
+
+If you would like to both download and launch this repository within RStudio with one line of code, you can run this line in the console:
+
+`usethis::use_course("https://github.com/amkessler/sabew_2025_financial_economic_data_in_r/archive/refs/heads/main.zip")`
 
 A rendered web page of the walkthrough can be found here: <https://amkessler.github.io/sabew_2025_financial_economic_data_in_r/>
