@@ -29,11 +29,19 @@ options(scipen = 999)
 
 Let's briefly discuss [R](https://www.r-project.org/), [RStudio](https://posit.co/download/rstudio-desktop/) and [Quarto](https://quarto.org/docs/guide/), and how they work together.
 
++-------------------------+-------------------------------+
+| ![](images/rstudio.jpg) | ![](images/R_logo.svg-01.png) |
++-------------------------+-------------------------------+
+
 We'll also explain what R "[packages](https://r-packages.io/packages)" are and how they add extra superpowers to R that make your life easier.
 
 # Stock Data
 
-To gather and analyze financial data, we'll explore using the [`tidyquant`](https://cran.r-project.org/web/packages/tidyquant/readme/README.html) package - which allows us to directly download data on measures like stock prices as well as economic indicators from the Fed. By default stock data is sourced from Yahoo Finance, though the package also provides connectors to other sources.
+To gather and analyze financial data, we'll explore using the [`tidyquant`](https://cran.r-project.org/web/packages/tidyquant/readme/README.html) package - which allows us to directly download data on measures like stock prices as well as economic indicators from the Fed.
+
+[![](images/business-1730089_1280.jpg){fig-alt="Ahmad Ardity from Pixabay"}](https://pixabay.com/photos/business-stock-finance-market-1730089/)
+
+By default tidyquant's stock data is sourced from Yahoo Finance, though the package also provides connectors to other sources.
 
 ## Analyzing a company
 
@@ -392,6 +400,8 @@ A wealth of economic data can be extracted from the Federal Reserve Economic Dat
 
 Let's talk about them and FRED's vast richness of data for business reporting.
 
+[![](images/fred.jpg)](https://fred.stlouisfed.org/)
+
 In addition to the work we're doing here in R, for example, there is an [Excel plug-in](https://fred.stlouisfed.org/fred-addin/) for FRED data you may find useful as well. There's even a FRED [mobile app](https://fred.stlouisfed.org/fred-mobile/index.php).
 
 ## National Examples
@@ -476,7 +486,7 @@ arlington_pcpi
 
 Keep in mind, for many such localized measures, the FRED website makes it easy to see a nationwide map of all counties (or the relevant geographies) tied to a measure, by selecting the "View Map" button. Let's take a look.
 
-![](images/clipboard-2578817368.png)
+[![](images/clipboard-2578817368.png)](https://fred.stlouisfed.org/series/PCPI51013)
 
 Sticking with Arlington for a moment, let's now examine some other measures.
 
@@ -555,6 +565,8 @@ head(stock_data)
 
 ```
 
+### Excel
+
 Here's how we can export to Excel:
 
 ```{r}
@@ -563,11 +575,13 @@ writexl::write_xlsx(stock_data, "my_exported_file.xlsx")
 
 ```
 
+![](images/clipboard-180135568.png)
+
+### Google Sheets
+
 How about Google Sheets? Enter the `googlesheets4` package.
 
-Now let's try something even neater: could we have a shared Google Sheet that
-we can update with new records when they are available? That your non-tech-saavy
-colleagues could use and you could automatically update as needed?
+Now let's try something even neater: could we have a shared Google Sheet that we can update with new records when they are available? That your non-tech-saavy colleagues could use and you could automatically update as needed?
 
 ```{r}
 # sheet is here:
@@ -589,7 +603,6 @@ live_gsheet <- read_sheet(target_sheet_id, sheet = "dailystockprices")
 head(live_gsheet)
 ```
 
-
 ```{r}
 # compare latest dataset with gsheet to identify newest records that aren't yet in gsheet
 
@@ -599,7 +612,6 @@ new_records_toadd <- anti_join(stock_data, live_gsheet, by = "date")
 new_records_toadd
 
 ```
-
 
 ```{r}
 
@@ -613,3 +625,6 @@ new_records_toadd <- new_records_toadd %>%
 sheet_append(target_sheet_id, new_records_toadd)
 ```
 
+### Other Formats
+
+There are numerous [resources](https://sparkbyexamples.com/r-programming/exporting-data-from-r-a-guide-t-o-csv-txt-excel-spss-stata-sas-and-html-files/) for exporting to other file formats as well, should you wish to explore.
