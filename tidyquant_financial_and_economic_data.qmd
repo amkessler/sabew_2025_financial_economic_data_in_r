@@ -16,15 +16,24 @@ knitr::opts_chunk$set(echo = TRUE)
 
 library(tidyverse)
 library(tidyquant)
+library(writexl)
+library(googlesheets4)
+library(janitor)
 options(dplyr.summarise.inform = FALSE)
 options(scipen = 999)
 
 
 ```
 
-To gather and analyze financial data, we'll explore using the `tidyquant` package - which allows us to directly download data on measures like stock prices as well as economic indicators from the Fed.
+# What is R?
+
+Let's briefly discuss [R](https://www.r-project.org/), [RStudio](https://posit.co/download/rstudio-desktop/) and [Quarto](https://quarto.org/docs/guide/), and how they work together.
+
+We'll also explain what R "[packages](https://r-packages.io/packages)" are and how they add extra superpowers to R that make your life easier.
 
 # Stock Data
+
+To gather and analyze financial data, we'll explore using the [`tidyquant`](https://cran.r-project.org/web/packages/tidyquant/readme/README.html) package - which allows us to directly download data on measures like stock prices as well as economic indicators from the Fed. By default stock data is sourced from Yahoo Finance, though the package also provides connectors to other sources.
 
 ## Analyzing a company
 
@@ -50,7 +59,9 @@ stock_data
 
 As you can see above, we can specify how far back we want the data to go. (You can also optionally set and end by using `to =` ... if you don't, it just defaults to the most recent day.)
 
-Now here's where it gets even more interesting and powerful... Let's say instead of daily prices, you wish you could look at it on a monthly basis. Or annually. Or weekly. Well you could write some custom code yourself aimed at pulling out just the records for the last day of the month -- but you don't have to come up with that: tidyquant has done it for you using its `tq_transmute()` function. (The function uses the powers of other financial packages such as xts, quantmod and TTR under the hood.)
+Now here's where it gets even more interesting and powerful... Let's say instead of daily prices, you wish you could look at it on a monthly basis. Or annually. Or weekly.
+
+Well you could write some custom code yourself aimed at pulling out just the records for the last day of the month -- but you don't have to come up with that: tidyquant has done it for you using its `tq_transmute()` function. (The function uses the powers of other financial packages such as xts, quantmod and TTR under the hood.)
 
 Modify our data to be monthly instead, based on the last closing price of the month.
 
@@ -143,7 +154,7 @@ stock_data_from2000 %>%
 
 ```
 
-Now keep in mind what we did above used the closing price of the stock. But we might want to take into account dividends, stock splits, etc., which can affect as the stock's value. If we want to adjust for these things to achieve a potentially more accurate picture of the stock's returns over time, we can use the adjusted field in the data instead.
+Now keep in mind what we did above used the closing price of the stock. But we might want to take into account dividends, stock splits, etc., which can affect as the stock's value. If we want to adjust for these things to achieve a potentially more accurate picture of the stock's returns over time, we can use the **adjusted** field in the data instead.
 
 ```{r}
 
@@ -159,7 +170,9 @@ stock_data_from2000 %>%
 
 ## Visualizing
 
-Want to visualize the returns? We can do that too, using the ggplot2 package augmented by tidyquant.
+Want to visualize the returns?
+
+We can do that too, using the [`ggplot2`](https://ggplot2.tidyverse.org/) package, augmented by tidyquant.
 
 First let's make sure we've saved our annual return dataset as a new named object.
 
@@ -211,12 +224,15 @@ annualreturns_data %>%
 
 ```
 
-What other kinds of visualizations can we do? How about we create a line chart of the stock's closing price over time. We can do this by using the `geom_line()` function of ggplot2. To simplify we'll use our original stock data from 2020. For example:
+What other kinds of visualizations can we do?
+
+How about we create a line chart of the stock's closing price over time. We can do this by using the `geom_line()` function of ggplot2. To simplify we'll use our original stock data from 2020. For example:
 
 ```{r}
 
 ggplot(stock_data, aes(x = date, y = adjusted)) +
   geom_line()
+
 ```
 
 If we wanted to add some labels...
@@ -279,7 +295,10 @@ Exponential moving averages (EMA) Weighted moving averages (WMA) Double exponent
 You may be asking, could I grab data on more than one company, so I can compare them? Indeed.
 
 ```{r}
-mycompanies  <- tq_get(c("AAPL", "MSFT", "NYT", "XOM"), 
+mycompanies  <- tq_get(c("AAPL", # Apple
+                         "MSFT", # Microsoft
+                         "NYT", # New York Times
+                         "XOM"), # ExxonMobil
                        get = "stock.prices", 
                        from = "2023-01-01")
 mycompanies
@@ -313,14 +332,18 @@ mycompanies %>%
   theme_minimal()
 ```
 
-What if we wanted to say something like "The stock of Company X closed at its 
-lowest price since TK?"\
+## Lowest or Highest Since X?
+
+What if we wanted to say something like "The stock of Company X closed at its lowest price since X?"\
+
 How might we do that. We can use some additional R code using the tidyverse ecosystem of packages to perform some analysis that gives us that answer.
 
 ```{r}
 #using Tesla as example... 
 # we'll choose a moment where it's stock was particularly
-# low, to show how this would work on a daily beat
+# low, to show how this would work on a daily beat.
+# We'll use the regular close for this example, but remember you may want to 
+# use the adjusted close, depending.
 
 mydata <-  tq_get("TSLA", 
                  get = "stock.prices", 
@@ -347,7 +370,6 @@ mydata %>%
   select(symbol, date, close)
 ```
 
-
 ```{r}
 # lowest closing prices for the company during the period captured?
 mydata %>% 
@@ -361,7 +383,6 @@ mydata %>%
 
 
 ```
-
 
 <br>
 
@@ -433,11 +454,7 @@ tq_get("UNRATE", get = "economic.data", from = "2018-01-01") %>%
 
 ```
 
-
-
-
 TKTKTK TKTKTKTK
-
 
 ## Localized examples
 
@@ -530,16 +547,69 @@ Once I have what I want, how can I get things out of R if I want to share it wit
 Not to fear: you can export dataframes from R into lots of formats, including Excel.\
 Let's do that now using the writexl pacakge.
 
-```{r}
-
-
-
-```
-
-How about Google Sheets? Enter the googlesheets4 package.
+We'll go back to our original daily stock price dataset, which we compiled earlier:
 
 ```{r}
 
-
+head(stock_data)
 
 ```
+
+Here's how we can export to Excel:
+
+```{r}
+
+writexl::write_xlsx(stock_data, "my_exported_file.xlsx")
+
+```
+
+How about Google Sheets? Enter the `googlesheets4` package.
+
+Now let's try something even neater: could we have a shared Google Sheet that
+we can update with new records when they are available? That your non-tech-saavy
+colleagues could use and you could automatically update as needed?
+
+```{r}
+# sheet is here:
+# https://docs.google.com/spreadsheets/d/1U0LVjDZUS_kV_GQxcSKU6Gebrl6jprUmxdkdfq9CYsc/edit?usp=sharing
+
+# to authorize via web the first time
+# gs4_auth()
+
+# to automatically select a previously authorized token based on google account email
+# storied locally in .Renviron
+gs4_auth(Sys.getenv("GOOGLE_ACCOUNT_EMAIL"))
+
+# import shared google sheet
+# specify id
+target_sheet_id <- "1fxFzpPC76KtgKkHtK0oXUuUYfo9EKdFUbFmgmAKq0eM"
+# read in the sheet based on that id
+live_gsheet <- read_sheet(target_sheet_id, sheet = "dailystockprices")
+
+head(live_gsheet)
+```
+
+
+```{r}
+# compare latest dataset with gsheet to identify newest records that aren't yet in gsheet
+
+# anti join to spot new ones based on EO id number
+new_records_toadd <- anti_join(stock_data, live_gsheet, by = "date")
+
+new_records_toadd
+
+```
+
+
+```{r}
+
+# round the values to help match what's in google sheet
+new_records_toadd <- new_records_toadd %>% 
+  mutate(across(c(open, high, low, close, adjusted), 
+                ~round_half_up(., digits = 2)))
+
+
+# now we'll append new records to live gsheet
+sheet_append(target_sheet_id, new_records_toadd)
+```
+
