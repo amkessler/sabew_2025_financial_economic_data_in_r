@@ -4,6 +4,7 @@ author: "Aaron Kessler"
 date: "`r format(Sys.time(), '%B %d, %Y')`"
 format:
   html:
+    output-file: index.html
     self-contained: true
     toc: true
     toc-location: left
@@ -190,8 +191,7 @@ annualreturns_data %>%
 
 ```
 
-We can spruce up the chart in any way we want - let's say for example we wanted to
-show colors tied to positive or negative returns.
+We can spruce up the chart in any way we want - let's say for example we wanted to show colors tied to positive or negative returns.
 
 ```{r}
 
@@ -313,6 +313,55 @@ mycompanies %>%
   theme_minimal()
 ```
 
+What if we wanted to say something like "The stock of Company X closed at its 
+lowest price since TK?"\
+How might we do that. We can use some additional R code using the tidyverse ecosystem of packages to perform some analysis that gives us that answer.
+
+```{r}
+#using Tesla as example... 
+# we'll choose a moment where it's stock was particularly
+# low, to show how this would work on a daily beat
+
+mydata <-  tq_get("TSLA", 
+                 get = "stock.prices", 
+                 from = "2022-01-01",
+                 to = "2025-03-11") %>% 
+            arrange(desc(date))
+
+mydata
+
+# most recent
+mydata %>% 
+  slice_max(date, n = 1)
+
+# store the most recent price value 
+mydata_current_price <- mydata %>% 
+  slice_max(date, n = 1) %>% 
+  pull(close)
+
+mydata_current_price
+
+# search for at least as low
+mydata %>% 
+  filter(close <= mydata_current_price) %>% 
+  select(symbol, date, close)
+```
+
+
+```{r}
+# lowest closing prices for the company during the period captured?
+mydata %>% 
+  select(symbol, date, close) %>% 
+  arrange(close)
+
+# highest
+mydata %>% 
+  select(symbol, date, close) %>% 
+  arrange(desc(close))
+
+
+```
+
 
 <br>
 
@@ -324,7 +373,7 @@ Let's talk about them and FRED's vast richness of data for business reporting.
 
 In addition to the work we're doing here in R, for example, there is an [Excel plug-in](https://fred.stlouisfed.org/fred-addin/) for FRED data you may find useful as well. There's even a FRED [mobile app](https://fred.stlouisfed.org/fred-mobile/index.php).
 
-## Examples
+## National Examples
 
 US Regular All Formulations Gas Price (GASREGW), weekly
 
@@ -384,7 +433,15 @@ tq_get("UNRATE", get = "economic.data", from = "2018-01-01") %>%
 
 ```
 
-FRED even compiles numerous measures below the national level, which you can apply to the local community or region in which you live for insights and comparisons.
+
+
+
+TKTKTK TKTKTKTK
+
+
+## Localized examples
+
+FRED also compiles numerous measures below the national level - you can find many for the local community or region in which you live:
 
 https://fred.stlouisfed.org/categories/3008
 
@@ -400,9 +457,11 @@ arlington_pcpi
 
 ```
 
-Keep in mind that for many such localized measures, the FRED site makes it easy to see a nationwide map of all counties, or the relevant geographies. Let's take a look. 
+Keep in mind, for many such localized measures, the FRED website makes it easy to see a nationwide map of all counties (or the relevant geographies) tied to a measure, by selecting the "View Map" button. Let's take a look.
 
-Sticking with Arlington for a moment, let's examine some other measures.
+![](images/clipboard-2578817368.png)
+
+Sticking with Arlington for a moment, let's now examine some other measures.
 
 How about the [5-year home ownership rate estimate](https://fred.stlouisfed.org/series/HOWNRATEACS051013).
 
@@ -462,3 +521,25 @@ tq_get("WDXRSA", get = "economic.data", from = "2014-01-01") %>%
 ```
 
 As you can see, there are almost an infinite number of ways to use FRED data both to capture the local picture, as well as the national one, and search for information that can help fuel insightful reporting.
+
+# Getting data out of R
+
+You may be wondering, ok this is pretty cool how R is able to deal with this data, but I might be one of the few people in my newsroom (or the only one!) who learns to use R.\
+Once I have what I want, how can I get things out of R if I want to share it with colleagues who only know spreadsheets?
+
+Not to fear: you can export dataframes from R into lots of formats, including Excel.\
+Let's do that now using the writexl pacakge.
+
+```{r}
+
+
+
+```
+
+How about Google Sheets? Enter the googlesheets4 package.
+
+```{r}
+
+
+
+```
