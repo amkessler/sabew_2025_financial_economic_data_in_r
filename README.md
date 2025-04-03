@@ -1,12 +1,9 @@
 # 2025 SABEW Conference: Analyzing Financial and Economic Data in R
 
-This repository contains the code used for the R presentation given at the
-2025 Society of American Business Editors & Writers conference in Arlington, Va.
+This repository contains the code used for the R presentation given at the 2025 Society of American Business Editors & Writers [conference](https://sabew.org/event/sabew25/) in Arlington, Va.
 
-The packages you'll need to install to use the included code are:
+To install the packages you'll need to run this demonstration, you can run this line in the console within RStudio:
 
-- tidyverse
-- tidyquant
-- tidycensus
-- janitor
-- writexl
+`install.packages(c("tidyverse", "lubridate", "janitor", "tidyquant", "writexl", "googlesheets4"))`
+
+A rendered web page of the walkthrough can be found here: <https://amkessler.github.io/sabew_2025_financial_economic_data_in_r/>
