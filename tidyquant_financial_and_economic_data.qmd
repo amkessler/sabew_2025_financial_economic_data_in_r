@@ -29,9 +29,9 @@ options(scipen = 999)
 
 Let's briefly discuss [R](https://www.r-project.org/), [RStudio](https://posit.co/download/rstudio-desktop/) and [Quarto](https://quarto.org/docs/guide/), and how they work together.
 
-+-------------------------+-------------------------------+
+|                         |                               |
+|-------------------------|-------------------------------|
 | ![](images/rstudio.jpg) | ![](images/R_logo.svg-01.png) |
-+-------------------------+-------------------------------+
 
 We'll also explain what R "[packages](https://r-packages.io/packages)" are and how they add extra superpowers to R that make your life easier.
 
@@ -392,9 +392,58 @@ mydata %>%
 
 ```
 
+We can do something similar to look for things like the largest *percentage* 
+daily drop (i.e. negative return) since X.  
+
+With the tumult in the overall stock market this past week, we've seen a lot of 
+news coverage doing this kind of comparison.  
+
+Let's take a look at the S&P 500 index.
+
+
+```{r}
+sp500_daily <- tq_get("^GSPC", get = "stock.prices", from = "2010-01-01") 
+
+head(sp500_daily)
+
+```
+
+
+```{r}
+sp500_daily_return <- sp500_daily %>%
+  tq_transmute(select = close,
+               mutate_fun = periodReturn,
+               period = "daily",
+               col_rename = "daily_return") %>% 
+  arrange(desc(date))
+
+sp500_daily_return
+```
+
+
+```{r}
+# store the most recent price value 
+sp500_last_return_value <- sp500_daily_return %>% 
+  slice_max(date, n = 1) %>% 
+  pull(daily_return)
+
+# search for at least as bad return values
+sp500_daily_return %>% 
+  filter(daily_return <= sp500_last_return_value) 
+
+```
+
+
+```{r}
+
+```
+
+
 <br>
 
-# FRED Economic Data
+
+
+# Economic Data - FRED
 
 A wealth of economic data can be extracted from the Federal Reserve Economic Data (FRED) database. [FRED](https://fredhelp.stlouisfed.org/fred/about/about-fred/what-is-fred/) contains thousands of [data sets](https://fred.stlouisfed.org/) that are free to use. See the FRED categories to narrow down the data base and to get data codes. categories: https://fred.stlouisfed.org/categories
 
