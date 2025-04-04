@@ -116,8 +116,6 @@ stock_data_from2000 %>%
                  mutate_fun = to.yearly, #here's the change
                  indexAt = "lastof")
 
-
-
 ```
 
 Keep in mind, depending on the use case, and as you get more comfortable with this, you can combine some of these steps together...
@@ -129,7 +127,6 @@ tq_get(ticker, get = "stock.prices", from = "2000-01-01") %>%
     tq_transmute(select = close, 
                  mutate_fun = to.yearly, #here's the change
                  indexAt = "lastof")
-
 
 ```
 
@@ -145,8 +142,6 @@ stock_data_from2000 %>%
                period = "yearly",
                col_rename = "annual_return")
 
-
-
 ```
 
 Want to see monthly returns instead? It's as simple as doing:
@@ -156,9 +151,8 @@ Want to see monthly returns instead? It's as simple as doing:
 stock_data_from2000 %>%
   tq_transmute(select = close,
                mutate_fun = periodReturn,
-               period = "monthly", #here's the change
+               period = "monthly", # <<<< here's the change
                col_rename = "monthly_return")
-
 
 ```
 
@@ -171,8 +165,6 @@ stock_data_from2000 %>%
                mutate_fun = periodReturn,
                period = "yearly",
                col_rename = "annual_return")
-
-
 
 ```
 
@@ -229,7 +221,6 @@ annualreturns_data %>%
     theme_tq() +
     theme(legend.position = "none")
 
-
 ```
 
 What other kinds of visualizations can we do?
@@ -246,10 +237,12 @@ ggplot(stock_data, aes(x = date, y = adjusted)) +
 If we wanted to add some labels...
 
 ```{r}
+
 stock_data %>%
   ggplot(aes(x = date, y = adjusted)) +
   geom_line() +
   labs(title = "Stock Price", y = "Closing Price", x = "")
+
 ```
 
 Now once again, we have some very helpful financial measures built in to tidyquant. Let's say we'd like to smooth things out here a bit, and calculate a moving average? The `geom_ma()` function delivers it for us.
@@ -263,6 +256,7 @@ stock_data %>%
   labs(title = "Stock Price", y = "Closing Price", x = "") +
   geom_ma(ma_fun = SMA, n = 50, color = "red", linewidth = 1.25) +
   theme_minimal()
+
 ```
 
 Want a 30-day moving average instead? Well you just have make one tiny tweak.
@@ -303,6 +297,7 @@ Exponential moving averages (EMA) Weighted moving averages (WMA) Double exponent
 You may be asking, could I grab data on more than one company, so I can compare them? Indeed.
 
 ```{r}
+
 mycompanies  <- tq_get(c("AAPL", # Apple
                          "MSFT", # Microsoft
                          "NYT", # New York Times
@@ -310,21 +305,26 @@ mycompanies  <- tq_get(c("AAPL", # Apple
                        get = "stock.prices", 
                        from = "2023-01-01")
 mycompanies
+
 ```
 
 ```{r}
+
 mycompanies %>% 
   count(symbol)
+
 ```
 
 Now we'll chart those out to compare, using almost identical code as above, but with some changes to allow small-multiple charts using `facet_wrap()`.
 
 ```{r}
+
 mycompanies %>%
   ggplot(aes(x = date, y = close)) +
   geom_line() +
   labs(title = "", y = "Closing Price", x = "") +
   facet_wrap(~ symbol, ncol = 2, scale = "free_y")
+
 ```
 
 Want to add that moving average again? Can do that, too.
@@ -338,15 +338,18 @@ mycompanies %>%
   geom_ma(ma_fun = SMA, n = 50, color = "red", size = 1.25) +
   facet_wrap(~ symbol, ncol = 2, scale = "free_y") +
   theme_minimal()
+
 ```
 
 ## Lowest or Highest Since X?
 
 What if we wanted to say something like "The stock of Company X closed at its lowest price since X?"\
 
-How might we do that. We can use some additional R code using the tidyverse ecosystem of packages to perform some analysis that gives us that answer.
+How might we do that. We can use some additional R code using the tidyverse ecosystem of packages to perform some analysis that gives us that answer.  
+
 
 ```{r}
+
 #using Tesla as example... 
 # we'll choose a moment where it's stock was particularly
 # low, to show how this would work on a daily beat.
@@ -376,6 +379,7 @@ mydata_current_price
 mydata %>% 
   filter(close <= mydata_current_price) %>% 
   select(symbol, date, close)
+
 ```
 
 ```{r}
@@ -389,27 +393,24 @@ mydata %>%
   select(symbol, date, close) %>% 
   arrange(desc(close))
 
-
 ```
 
-We can do something similar to look for things like the largest *percentage* 
-daily drop (i.e. negative return) since X.  
+We can do something similar to look for things like the largest *percentage* daily drop (i.e. negative return) since X.
 
-With the tumult in the overall stock market this past week, we've seen a lot of 
-news coverage doing this kind of comparison.  
+With the tumult in the overall stock market this past week, we've seen a lot of news coverage doing this kind of comparison.
 
 Let's take a look at the S&P 500 index.
 
-
 ```{r}
+
 sp500_daily <- tq_get("^GSPC", get = "stock.prices", from = "2010-01-01") 
 
 head(sp500_daily)
 
 ```
 
-
 ```{r}
+
 sp500_daily_return <- sp500_daily %>%
   tq_transmute(select = close,
                mutate_fun = periodReturn,
@@ -418,8 +419,8 @@ sp500_daily_return <- sp500_daily %>%
   arrange(desc(date))
 
 sp500_daily_return
-```
 
+```
 
 ```{r}
 # store the most recent price value 
@@ -433,15 +434,11 @@ sp500_daily_return %>%
 
 ```
 
-
 ```{r}
 
 ```
 
-
 <br>
-
-
 
 # Economic Data - FRED
 
@@ -459,39 +456,51 @@ US Regular All Formulations Gas Price (GASREGW), weekly
 
 ```{r}
 
-gasprices <- tq_get("GASREGW", get = "economic.data", from = "2023-01-01")
+gasprices <- tq_get("GASREGW", 
+                    get = "economic.data", 
+                    from = "2023-01-01")
 
 gasprices
 
 ```
 
 ```{r}
+
 gasprices %>% 
   ggplot(aes(x = date, y = price)) +
   geom_line(color = "darkred") +
   theme_minimal()
+
 ```
 
 30 year mortgage rate average, weekly
 
 ```{r}
 
-mortgate_30yr_weekly <- tq_get("MORTGAGE30US", get = "economic.data", from = "2023-01-01")
+mortgate_30yr_weekly <- tq_get("MORTGAGE30US", 
+                               get = "economic.data", 
+                               from = "2023-01-01")
+
 mortgate_30yr_weekly
+
 ```
 
 ```{r}
+
 mortgate_30yr_weekly %>% 
   ggplot(aes(x = date, y = price)) +
   geom_line(color = "darkred") +
   theme_minimal()
+
 ```
 
 Consumer Price Index For All Urban Consumers, monthly
 
 ```{r}
 
-cpi <- tq_get("CPIAUCSL", get = "economic.data", from = "2018-01-01")
+cpi <- tq_get("CPIAUCSL", 
+              get = "economic.data", 
+              from = "2018-01-01")
 
 cpi 
 
@@ -529,8 +538,6 @@ arlington_pcpi <- tq_get("PCPI51013", get = "economic.data", from = "2010-01-01"
 
 arlington_pcpi 
 
-
-
 ```
 
 Keep in mind, for many such localized measures, the FRED website makes it easy to see a nationwide map of all counties (or the relevant geographies) tied to a measure, by selecting the "View Map" button. Let's take a look.
@@ -547,9 +554,6 @@ arlington_5yhomeownership <- tq_get("HOWNRATEACS051013", get = "economic.data", 
 
 arlington_5yhomeownership 
 
-
-
-
 ```
 
 How about the county's [Subprime Credit Population, by quarter](https://fred.stlouisfed.org/series/EQFXSUBPRIME051013). This data only begins in 2014, but...pretty interesting!
@@ -564,7 +568,6 @@ arlington_subprimepop %>%
   ggplot(aes(x = date, y = price)) +
   geom_line(color = "darkred") +
   theme_minimal()
-
 
 ```
 
@@ -581,7 +584,6 @@ dc_bizapplications %>%
   geom_line(color = "darkred") +
   theme_minimal()
 
-
 ```
 
 While we're at it, how are home prices looking around the whole DC metro area? Let's examine the [Case-Shiller index](https://fred.stlouisfed.org/series/WDXRSA)...
@@ -592,7 +594,6 @@ tq_get("WDXRSA", get = "economic.data", from = "2014-01-01") %>%
   ggplot(aes(x = date, y = price)) +
   geom_line(color = "darkred") +
   theme_minimal()
-
 
 ```
 
@@ -650,6 +651,7 @@ target_sheet_id <- "1fxFzpPC76KtgKkHtK0oXUuUYfo9EKdFUbFmgmAKq0eM"
 live_gsheet <- read_sheet(target_sheet_id, sheet = "dailystockprices")
 
 head(live_gsheet)
+
 ```
 
 ```{r}
@@ -663,15 +665,21 @@ new_records_toadd
 ```
 
 ```{r}
-
 # round the values to help match what's in google sheet
 new_records_toadd <- new_records_toadd %>% 
   mutate(across(c(open, high, low, close, adjusted), 
                 ~round_half_up(., digits = 2)))
 
+new_records_toadd
+
+```
+
+
+```{r}
 
 # now we'll append new records to live gsheet
 sheet_append(target_sheet_id, new_records_toadd)
+
 ```
 
 ### Other Formats
