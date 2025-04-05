@@ -26,6 +26,8 @@ options(scipen = 999)
 
 ```
 
+*The github repository with the code for this walkthrough can be found [here](https://github.com/amkessler/sabew_2025_financial_economic_data_in_r).*
+
 # What is R?
 
 Let's briefly discuss [R](https://www.r-project.org/), [RStudio](https://posit.co/download/rstudio-desktop/) and [Quarto](https://quarto.org/docs/guide/), and how they work together.
