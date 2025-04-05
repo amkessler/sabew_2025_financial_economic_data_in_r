@@ -4,7 +4,7 @@ This repository contains the code used for the R presentation given at the 2025 
 
 To install the packages you'll need to run this demonstration, you can run this line in the console within RStudio:
 
-`install.packages(c("tidyverse", "lubridate", "janitor", "tidyquant", "writexl", "googlesheets4", "usethis"))`
+`install.packages(c("tidyverse", "lubridate", "janitor", "tidyquant", "writexl", "googlesheets4", "usethis", "DT"))`
 
 You can clone this repository, or if you would like to both download/launch this project within RStudio with one line of code, you can run this in the console:
 

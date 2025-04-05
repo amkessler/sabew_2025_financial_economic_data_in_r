@@ -1,7 +1,7 @@
 ---
-title: "Financial/Economic Data using TidyQuant"
+title: "SABEW 2025: Using R for Analyzing Financial and Economic Data"
 author: "Aaron Kessler"
-date: "`r format(Sys.time(), '%B %d, %Y')`"
+date: "2025-04-05"
 format:
   html:
     output-file: index.html
@@ -48,6 +48,8 @@ By default tidyquant's stock data is sourced from Yahoo Finance, though the pack
 
 Let's see how we grab stock price data directly from the web and work with it. First we'll assign the stock ticker/symbol for the company we're interested in exploring.
 
+In R, you assign value(s) to a saved name in your environment using the arrow (`<-`).
+
 ```{r}
 
 ticker <- "MSFT"  
@@ -86,7 +88,9 @@ stocks_monthly
 
 ```
 
-Want to try annually instead? It's just a matter of one small tweak. Check it out...
+Want to try annually instead?
+
+It's just a matter of one small tweak. Check it out...
 
 ```{r}
 
@@ -157,7 +161,9 @@ stock_data_from2000 %>%
 
 ```
 
-Now keep in mind what we did above used the closing price of the stock. But we might want to take into account dividends, stock splits, etc., which can affect as the stock's value. If we want to adjust for these things to achieve a potentially more accurate picture of the stock's returns over time, we can use the **adjusted** field in the data instead.
+Now keep in mind what we did above used the closing price of the stock. But we might want to take into account dividends, stock splits, etc., which can affect as the stock's value.
+
+If we want to adjust for these things to achieve a potentially more accurate picture of the stock's returns over time, we can use the **adjusted** field in the data instead.
 
 ```{r}
 
@@ -175,7 +181,7 @@ Want to visualize the returns?
 
 We can do that too, using the [`ggplot2`](https://ggplot2.tidyverse.org/) package, augmented by tidyquant.
 
-First let's make sure we've saved our annual return dataset as a new named object.
+First, let's make sure we've saved our annual return dataset as a new named object.
 
 ```{r}
 annualreturns_data <- stock_data_from2000 %>%
@@ -289,9 +295,19 @@ stock_data %>%
 
 And remember once again, like we did earlier above, we could choose to look at weekly, monthly, or annual prices instead of daily.
 
-Also, note that above we're using a Simple Moving Average (SMA) for all of our analysis. But tidyquant also supports a range of other calculations, including:
+Also, note that above we're using a **Simple Moving Average (SMA)** for all of our analysis here. But tidyquant also supports a range of other calculations, including:
 
-Exponential moving averages (EMA) Weighted moving averages (WMA) Double exponential moving averages (DEMA) Zero-lag exponential moving averages (ZLEMA) Volume-weighted moving averages (VWMA) Elastic volume-weighted moving averages (EVWMA)
+-   Exponential moving averages (EMA)
+
+-   Weighted moving averages (WMA)
+
+-   Double exponential moving averages (DEMA)
+
+-   Zero-lag exponential moving averages (ZLEMA)
+
+-   Volume-weighted moving averages (VWMA)
+
+-   Elastic volume-weighted moving averages (EVWMA)
 
 ## Multiple companies at once
 
@@ -344,10 +360,9 @@ mycompanies %>%
 
 ## Lowest or Highest Since X?
 
-What if we wanted to say something like "The stock of Company X closed at its lowest price since X?"\
+What if we wanted to say something like "The stock of ABC Company closed at its lowest price since X"...?
 
-How might we do that. We can use some additional R code using the tidyverse ecosystem of packages to perform some analysis that gives us that answer.  
-
+How might we do that. We can use some additional R code using the tidyverse ecosystem of packages to perform some analysis that gives us that answer.
 
 ```{r}
 
@@ -495,7 +510,7 @@ mortgate_30yr_weekly %>%
 
 ```
 
-Consumer Price Index For All Urban Consumers, monthly
+Consumer Price Index for all urban consumers, monthly
 
 ```{r}
 
@@ -522,8 +537,6 @@ tq_get("UNRATE", get = "economic.data", from = "2018-01-01") %>%
   theme_minimal()
 
 ```
-
-TKTKTK TKTKTKTK
 
 ## Localized examples
 
@@ -600,15 +613,15 @@ tq_get("WDXRSA", get = "economic.data", from = "2014-01-01") %>%
 
 As you can see, there are almost an infinite number of ways to use FRED data both to capture the local picture, as well as the national one, and search for information that can help fuel insightful reporting.
 
+<br>
+
 # Getting data out of R
 
-You may be wondering, ok this is pretty cool how R is able to deal with this data, but I might be one of the few people in my newsroom (or the only one!) who learns to use R.\
-Once I have what I want, how can I get things out of R if I want to share it with colleagues who only know spreadsheets?
+You may be wondering, ok this is pretty cool using R, but I might be one of the few people in my newsroom (or the only one!) who learns to use it. Once I have what I want, can I get things out of R to share with other colleagues?
 
-Not to fear: you can export dataframes from R into lots of formats, including Excel.\
-Let's do that now using the writexl pacakge.
+Not to fear: you can export dataframes from R into lots of formats, including Excel spreadsheets.
 
-We'll go back to our original daily stock price dataset, which we compiled earlier:
+We'll go back to our original daily stock price dataset, which we compiled earlier.
 
 ```{r}
 
@@ -618,7 +631,7 @@ head(stock_data)
 
 ### Excel
 
-Here's how we can export to Excel:
+Here's how we can export to Excel, using the `writexl` package:
 
 ```{r}
 
@@ -632,7 +645,9 @@ writexl::write_xlsx(stock_data, "my_exported_file.xlsx")
 
 How about Google Sheets? Enter the `googlesheets4` package.
 
-Now let's try something even neater: could we have a shared Google Sheet that we can update with new records when they are available? That your non-tech-saavy colleagues could use and you could automatically update as needed?
+Let's try something: could we have a shared Google Sheet we update with new records when they are available? Then your non-tech-savvy colleagues could use that google sheet and it would have the latest and greatest numbers when needed.
+
+Let's look at how we could do that:
 
 ```{r}
 # sheet is here:
@@ -644,6 +659,7 @@ Now let's try something even neater: could we have a shared Google Sheet that we
 # to automatically select a previously authorized token based on google account email
 # storied locally in .Renviron
 gs4_auth(Sys.getenv("GOOGLE_ACCOUNT_EMAIL"))
+
 
 # import shared google sheet
 # specify id
@@ -682,18 +698,31 @@ sheet_append(target_sheet_id, new_records_toadd)
 
 ```
 
+### Embed interactive tables right within a webpage
 
-### Embed interactive tables right within your mini-webpage
+Now watch this: what if you didn't want to have to export files at all when you're collaborating with others.
 
-Want your days of sending multiple versions of spreadsheets files back and forth?  
-To leave behind the days of stockdata1, stockdata2, stockdata_final, stockdata_final_final...  
-You can actually create interactive, downloadable data tables directly within R
-to share your findings with colleages. We'll look at an example using the DT package.
+Want your days of sending multiple versions of spreadsheets files back and forth? To leave behind the days of *stockdata1, stockdata2, stockdata_final, stockdata_final_final*...?
+
+You can actually create interactive, downloadable data tables directly within a web page generated by R to share your findings with other reporters and editors. We'll look at an example using the `DT` package.
+
+The DT package does a lot of work even with one single function - called, naturally, `datatable()` - to build an interactive table in javascript. But you don't have to know any javascript (yay). You just need to know how to access the relevant R commands. Check it out:
 
 ```{r}
 
 stock_data %>% 
-  datatable(
+  DT::datatable()
+
+```
+
+Not bad for a single line of code!
+
+Then you can customize various aspects to your heart's content from there. For example, we can add filters, numeric formatting, even download buttons:
+
+```{r}
+
+stock_data %>% 
+  DT::datatable(
     rownames = FALSE, 
     filter = "top", 
     class = "compact hover stripe",  
@@ -703,9 +732,6 @@ stock_data %>%
       buttons = c("excel", "csv", "copy", "print"),
       autoWidth = TRUE,
       searchHighlight = TRUE,
-      # pageLength = 25, # show more rows by default
-      lengthMenu = c(5, 10, 25, 50, 100),
-      paging = FALSE, 
       scrollY = "400px", # enable vertical scrolling
       scrollCollapse = TRUE
     )
@@ -723,5 +749,6 @@ stock_data %>%
 
 ```
 
+<br>
 
-
+-- 30 —
