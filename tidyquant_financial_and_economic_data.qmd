@@ -19,6 +19,7 @@ library(tidyquant)
 library(writexl)
 library(googlesheets4)
 library(janitor)
+library(DT)
 options(dplyr.summarise.inform = FALSE)
 options(scipen = 999)
 
@@ -635,7 +636,7 @@ Now let's try something even neater: could we have a shared Google Sheet that we
 
 ```{r}
 # sheet is here:
-# https://docs.google.com/spreadsheets/d/1U0LVjDZUS_kV_GQxcSKU6Gebrl6jprUmxdkdfq9CYsc/edit?usp=sharing
+# https://docs.google.com/spreadsheets/d/1fxFzpPC76KtgKkHtK0oXUuUYfo9EKdFUbFmgmAKq0eM/edit?usp=sharing
 
 # to authorize via web the first time
 # gs4_auth()
@@ -674,7 +675,6 @@ new_records_toadd
 
 ```
 
-
 ```{r}
 
 # now we'll append new records to live gsheet
@@ -682,6 +682,46 @@ sheet_append(target_sheet_id, new_records_toadd)
 
 ```
 
-### Other Formats
 
-There are numerous [resources](https://sparkbyexamples.com/r-programming/exporting-data-from-r-a-guide-t-o-csv-txt-excel-spss-stata-sas-and-html-files/) for exporting to other file formats as well, should you wish to explore.
+### Embed interactive tables right within your mini-webpage
+
+Want your days of sending multiple versions of spreadsheets files back and forth?  
+To leave behind the days of stockdata1, stockdata2, stockdata_final, stockdata_final_final...  
+You can actually create interactive, downloadable data tables directly within R
+to share your findings with colleages. We'll look at an example using the DT package.
+
+```{r}
+
+stock_data %>% 
+  datatable(
+    rownames = FALSE, 
+    filter = "top", 
+    class = "compact hover stripe",  
+    extensions = c("Buttons"),
+    options = list(
+      dom = "Bfrtip",
+      buttons = c("excel", "csv", "copy", "print"),
+      autoWidth = TRUE,
+      searchHighlight = TRUE,
+      # pageLength = 25, # show more rows by default
+      lengthMenu = c(5, 10, 25, 50, 100),
+      paging = FALSE, 
+      scrollY = "400px", # enable vertical scrolling
+      scrollCollapse = TRUE
+    )
+  ) %>%
+  formatRound(
+    columns = c("open", "high", "low", 
+                "close", "adjusted"),
+    digits = 2
+  ) %>%
+  formatRound("volume", digits = 0) %>%
+  formatStyle('symbol',  color = '#242222', fontWeight = 'bold') 
+
+
+
+
+```
+
+
+
